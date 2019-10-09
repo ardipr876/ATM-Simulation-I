@@ -37,7 +37,7 @@ public class Validation {
         return result;
     }
     
-    public static Validation WithdrawValidation(Account account, String value) {
+    public static Validation WithdrawValidation(String value) {
         Validation result = new Validation();
         String regex = "[0-9]+";
         double amount = Double.parseDouble(value);
@@ -50,9 +50,6 @@ public class Validation {
         } else if(amount % 10 != 0) {
             result.valid = false;
             result.message = "Invalid ammount";
-        } else if(account.balance < amount) {
-            result.valid = false;
-            result.message = "Insufficient balance $" + value;
         } else {
             result.valid = true;
         }
