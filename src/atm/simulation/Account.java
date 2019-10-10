@@ -1,12 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package atm.simulation;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -23,15 +15,6 @@ public class Account {
         this.pin = pin;
         this.balance = balance;
         this.accountNumber = accountNumber;
-    }
-    
-    public static List<Account> getAccountList() {
-        List<Account> list = new ArrayList<>();
-        
-        list.add(new Account("John Doe", "012108", "112233", 100));
-        list.add(new Account("Jane Doe", "932012", "112244", 30));
-        
-        return list;
     }
 
     public String getPin() {

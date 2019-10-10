@@ -1,5 +1,7 @@
 package atm.simulation;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 /**
@@ -8,7 +10,7 @@ import java.util.Scanner;
  */
 public class Withdraw {
     public static String WithdrawScreen(Account account) {
-        System.out.println("---------------");
+        System.out.println("---------------------------------------------------------");
         System.out.println("Withdraw Screen");
         System.out.println("1. $10");
         System.out.println("2. $50");
@@ -21,43 +23,84 @@ public class Withdraw {
         String option = scannerOption.nextLine().trim();
         
         // Choice on summary screen, go to Transaction page or Exit (Login page)
-        String choice = ""; 
-
+        String goToScreen = ""; 
+        boolean succeed;
+        
         switch (option) {
             case "1":
-                choice = AccountService.DeductBalance(account, 10);
+                succeed = AccountService.DeductBalance(account, 10);
+                if(succeed){
+                    goToScreen = Summary(account.balance, 10);
+                }
                 break;
             case "2":
-                choice = AccountService.DeductBalance(account, 50);
+                succeed = AccountService.DeductBalance(account, 50);
+                if(succeed){
+                    goToScreen = Summary(account.balance, 50);
+                }
                 break;
             case "3":
-                choice = AccountService.DeductBalance(account, 100);
+                succeed = AccountService.DeductBalance(account, 100);
+                if(succeed){
+                    goToScreen = Summary(account.balance, 100);
+                }
                 break; 
             case "4":
-                choice = OtherWithdrawScreen(account);
+                goToScreen = OtherWithdrawScreen(account);
                 break;
         }
         
-        return choice;
+        return goToScreen;
     }
     
     public static String OtherWithdrawScreen(Account account) {
-        System.out.println("-----------------------------");
+        System.out.println("---------------------------------------------------------");
         System.out.println("Other Withdraw (Multiple $10)");
         System.out.print("Enter amount to withdraw: ");
         
         Scanner scannerAmount = new Scanner(System. in);
         String value = scannerAmount.nextLine().trim();
-        String choice = "Transaction";
+        String goToScreen = ScreenEnum.Screen.Transaction.name();
+        boolean succeed;
         
         Validation validation = Validation.WithdrawValidation(value);
         if(validation.valid){
             double amount = Double.parseDouble(value);
-            choice = AccountService.DeductBalance(account, amount);
+            succeed = AccountService.DeductBalance(account, amount);
+            if(succeed){
+                goToScreen = Summary(account.balance, amount);
+            }
         } else {
+            System.out.println("---------------------------------------------------------");
             System.out.println(validation.message);
         }
         
-        return choice;
+        return goToScreen;
+    }
+    
+    public static String Summary(double balance, double amount){
+        LocalDateTime date = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
+        String formatDateTime = date.format(formatter);
+        
+        System.out.println("---------------------------------------------------------");
+        System.out.println("Summary");
+        System.out.println("Date : " + formatDateTime);
+        System.out.println("Withdraw : $" + amount);
+        System.out.println("Balance : $" + balance);
+        
+        System.out.println("");
+        System.out.println("1. Transaction");
+        System.out.println("2. Exit");
+        System.out.print("Choose Option[2]: ");
+        
+        Scanner scannerOption = new Scanner(System. in);
+        String option = scannerOption.nextLine().trim();
+        
+        if(option.equals("1")) {
+            return ScreenEnum.Screen.Transaction.name();
+        } else {
+            return ScreenEnum.Screen.Login.name();
+        }
     }
 }

@@ -8,12 +8,11 @@ import java.util.List;
  */
 public class ATMSimulation {
     public static void main(String[] args) {
-        System.out.println("Welcome To ATM Simulation");
-        
-        List<Account> database = Account.getAccountList();
-        
+        List<Account> database = AccountService.getAccountList();
         do {
-            System.out.println("-------------------------");
+            System.out.println("---------------------------------------------------------");
+            System.out.println("Welcome To ATM Simulation");
+            System.out.println("---------------------------------------------------------");
             Account account = LoginService.Login(database);
             if(account != null) {
                 Transaction.TransactionScreen(account, database);

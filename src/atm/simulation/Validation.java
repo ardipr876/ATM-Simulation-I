@@ -17,8 +17,7 @@ public class Validation {
         Validation result = new Validation();
         
         if(value.length() == 6) {
-            String regex = "[0-9]+";
-            if(!value.matches(regex)) {
+            if(!OnlyNumberValidation(value)) {
                 result.valid = false;
                 result.message = type + " should only contains numbers";
             } else {
@@ -34,14 +33,17 @@ public class Validation {
     
     public static Validation WithdrawValidation(String value) {
         Validation result = new Validation();
-        String regex = "[0-9]+";
+        
+        if(!OnlyNumberValidation(value)) {
+            result.valid = false;
+            result.message = "Ammount should only contains numbers";
+            return result;
+        }
+        
         double amount = Double.parseDouble(value);
         if(amount > 1000) {
             result.valid = false;
             result.message = "Maximum amount to withdraw is $1000";
-        } else if(!value.matches(regex)) {
-            result.valid = false;
-            result.message = "Invalid ammount";
         } else if(amount % 10 != 0) {
             result.valid = false;
             result.message = "Invalid ammount";
@@ -50,5 +52,10 @@ public class Validation {
         }
         
         return result;
+    }
+    
+    public static boolean OnlyNumberValidation(String value) {
+        String regex = "[0-9]+";
+        return value.matches(regex);
     }
 }
