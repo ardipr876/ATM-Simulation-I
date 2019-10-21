@@ -1,21 +1,43 @@
-package com.mitrais.atm;
+package com.mitrais.atm.screens;
 
+import com.mitrais.atm.helpers.ValidationHelper;
+import com.mitrais.atm.models.AccountModel;
+import com.mitrais.atm.models.ValidationModel;
+import com.mitrais.atm.screens.enums.ScreenEnum;
+import com.mitrais.atm.services.AccountService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 /**
- * For withdrawal process
+ * Withdraw Screen
  * @author Ardi_PR876
  */
-public class Withdraw {
+public class WithdrawScreen {
+    private static WithdrawScreen INSTANCE;
+    private final AccountService accountService = AccountService.getInstance();
+    
+    private WithdrawScreen(){
+        
+    }
+    
+    /**
+     * Singleton Withdraw Screen
+     * @return WithdrawScreen INSTANCE
+     */
+    public static WithdrawScreen getInstance(){
+        if (INSTANCE == null) {
+            INSTANCE = new WithdrawScreen();
+        }
+        return INSTANCE;
+    }
     
     /**
         * Withdraw Screen
         * @param account
         * @return goToScreen String
     */
-    public static String withdrawScreen(Account account) {
+    public String withdraw(AccountModel account) {
         // Choice on summary screen, go to Transaction page or Exit (Login page)
         String goToScreen = "";
         
@@ -38,7 +60,7 @@ public class Withdraw {
         
         switch (option) {
             case "1":
-                succeed = AccountService.deductBalance(account, 10);
+                succeed = this.accountService.deductBalance(account, 10);
                 
                 if (succeed) {
                     balance -= 10;
@@ -46,7 +68,7 @@ public class Withdraw {
                 }
                 break;
             case "2":
-                succeed = AccountService.deductBalance(account, 50);
+                succeed = this.accountService.deductBalance(account, 50);
                 
                 if (succeed) {
                     balance -= 50;
@@ -54,7 +76,7 @@ public class Withdraw {
                 }
                 break;
             case "3":
-                succeed = AccountService.deductBalance(account, 100);
+                succeed = this.accountService.deductBalance(account, 100);
                 
                 if (succeed) {
                     balance -= 100;
@@ -62,7 +84,7 @@ public class Withdraw {
                 }
                 break; 
             case "4":
-                goToScreen = otherWithdrawScreen(account);
+                goToScreen = otherWithdraw(account);
                 break;
         }
         
@@ -74,14 +96,14 @@ public class Withdraw {
         * @param account
         * @return goToScreen String
     */
-    public static String otherWithdrawScreen(Account account) {
-        String goToScreen = ScreenEnum.Screen.TRANSACTION.name();
+    public String otherWithdraw(AccountModel account) {
+        String goToScreen = ScreenEnum.TRANSACTION.name();
         
         boolean succeed;
         
         Double balance = account.getBalance();
         
-        ValidationHelper validation;
+        ValidationModel validationModel;
         
         System.out.println("---------------------------------------------------------");
         System.out.println("Other Withdraw (Multiple $10)");
@@ -91,19 +113,19 @@ public class Withdraw {
         
         String value = scannerAmount.nextLine().trim();
         
-        validation = ValidationHelper.withdrawValidation(value);
+        validationModel = ValidationHelper.withdrawValidation(value);
         
-        if (validation.isValid()) {
+        if (validationModel.isValid()) {
             double amount = Double.parseDouble(value);
             
-            succeed = AccountService.deductBalance(account, amount);
+            succeed = this.accountService.deductBalance(account, amount);
             
             if (succeed) {
                 goToScreen = summary(balance, amount);
             }
         } else {
             System.out.println("---------------------------------------------------------");
-            System.out.println(validation.getMessage());
+            System.out.println(validationModel.getMessage());
         }
         
         return goToScreen;
@@ -115,7 +137,7 @@ public class Withdraw {
         * @param amount
         * @return ScreenEnum.name() String
     */
-    public static String summary(double balance, double amount){
+    public String summary(double balance, double amount){
         LocalDateTime date = LocalDateTime.now();
         
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
@@ -138,9 +160,9 @@ public class Withdraw {
         String option = scannerOption.nextLine().trim();
         
         if (option.equals("1")) {
-            return ScreenEnum.Screen.TRANSACTION.name();
+            return ScreenEnum.TRANSACTION.name();
         } else {
-            return ScreenEnum.Screen.LOGIN.name();
+            return ScreenEnum.LOGIN.name();
         }
     }
 }

@@ -1,10 +1,10 @@
-package com.mitrais.atm;
+package com.mitrais.atm.models;
 
 /**
- * Account property
+ * Account Model
  * @author Ardi_PR876
  */
-public class Account {
+public class AccountModel {
     private String name;
     
     private String pin;
@@ -14,13 +14,13 @@ public class Account {
     private String accountNumber;
     
     /**
-     * account constructor
+     * Constructor Account Model
      * @param name
      * @param accountNumber
      * @param pin
      * @param balance 
      */
-    public Account(String name, String accountNumber, String pin, double balance) {
+    public AccountModel(String name, String accountNumber, String pin, double balance) {
         this.name = name;
         
         this.pin = pin;

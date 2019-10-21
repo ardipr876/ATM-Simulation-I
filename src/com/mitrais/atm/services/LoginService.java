@@ -1,23 +1,44 @@
-package com.mitrais.atm;
+package com.mitrais.atm.services;
 
+import com.mitrais.atm.helpers.ValidationHelper;
+import com.mitrais.atm.models.AccountModel;
+import com.mitrais.atm.models.ValidationModel;
+import com.mitrais.atm.services.implement.ILoginService;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.function.Predicate;
 
 /**
- * For login process
+ * Login Service
  * @author Ardi_PR876
  */
-public class LoginService {
+public class LoginService implements ILoginService {
+    private static LoginService INSTANCE;
+    
+    private LoginService(){
+        
+    }
+    
+    /**
+     * Singleton Login Service
+     * @return LoginService INSTANCE
+     */
+    public static LoginService getInstance(){
+        if (INSTANCE == null) {
+            INSTANCE = new LoginService();
+        }
+        return INSTANCE;
+    }
     
     /**
         * Login Process
         * @param database List of Account
         * @return account Account
     */
-    public static Account login(List<Account> database) {
-        Account account = null;
+    @Override
+    public AccountModel login(List<AccountModel> database) {
+        AccountModel account = null;
         
         boolean validAccountNumber;
         
@@ -27,7 +48,7 @@ public class LoginService {
         
         boolean validPin;
         
-        ValidationHelper validation;
+        ValidationModel validationModel;
         
         do {
             System.out.print("Enter Account Number: ");
@@ -35,12 +56,12 @@ public class LoginService {
             
             accountNumber = scannerAccountNumber.nextLine();
             
-            validation = ValidationHelper.loginValidation(accountNumber, "Account Number");
+            validationModel = ValidationHelper.loginValidation(accountNumber, "Account Number");
             
-            validAccountNumber = validation.isValid();
+            validAccountNumber = validationModel.isValid();
             
             if (!validAccountNumber) {
-                System.out.println(validation.getMessage());
+                System.out.println(validationModel.getMessage());
             }
         } while (!validAccountNumber);
         
@@ -50,12 +71,12 @@ public class LoginService {
             
             pin = scannerPin.nextLine();
             
-            validation = ValidationHelper.loginValidation(pin, "PIN");
+            validationModel = ValidationHelper.loginValidation(pin, "PIN");
             
-            validPin = validation.isValid();
+            validPin = validationModel.isValid();
             
             if (!validPin) {
-                System.out.println(validation.getMessage());
+                System.out.println(validationModel.getMessage());
             }
         } while (!validPin);
         
@@ -63,10 +84,10 @@ public class LoginService {
         
         String finalPin = pin;
         
-        Predicate<Account> findAccount = p -> 
+        Predicate<AccountModel> findAccount = p -> 
                 p.getAccountNumber().equals(finalAccountNumber) && p.getPin().equals(finalPin);
         
-        Optional<Account> matchingAccount = database.stream().filter(findAccount).findFirst();
+        Optional<AccountModel> matchingAccount = database.stream().filter(findAccount).findFirst();
         
         if (matchingAccount.isPresent()) {
             account = matchingAccount.get();

@@ -1,5 +1,10 @@
-package com.mitrais.atm;
+package com.mitrais.atm.screens;
 
+import com.mitrais.atm.helpers.ValidationHelper;
+import com.mitrais.atm.models.AccountModel;
+import com.mitrais.atm.models.ValidationModel;
+import com.mitrais.atm.screens.enums.ScreenEnum;
+import com.mitrais.atm.services.AccountService;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
@@ -7,10 +12,26 @@ import java.util.Scanner;
 import java.util.function.Predicate;
 
 /**
- * For fund transfer process
+ * Fund Transfer Screen
  * @author Ardi_PR876
  */
-public class FundTransfer {
+public class FundTransferScreen {
+    private static FundTransferScreen INSTANCE;
+    
+    private FundTransferScreen(){
+        
+    }
+    
+    /**
+     * Singleton Fund Transfer Screen
+     * @return FundTransferScreen INSTANCE
+     */
+    public static FundTransferScreen getInstance(){
+        if (INSTANCE == null) {
+            INSTANCE = new FundTransferScreen();
+        }
+        return INSTANCE;
+    }
     
     /**
         * Fund Transfer Screen
@@ -18,10 +39,10 @@ public class FundTransfer {
         * @param database List of Account
         * @return goToScreen String
     */
-    public static String fundTransferScreen(Account account, List<Account> database) {
+    public String fundTransfer(AccountModel account, List<AccountModel> database) {
         boolean repeat = false;
         
-        String goToScreen = ScreenEnum.Screen.TRANSACTION.name();
+        String goToScreen = ScreenEnum.TRANSACTION.name();
         
         boolean validDestination;
 
@@ -39,27 +60,27 @@ public class FundTransfer {
             validDestination = ValidationHelper.onlyNumberValidation(destination);
 
             if (validDestination) {
-                Predicate<Account> predicate = p -> p.getAccountNumber().equals(destination);
+                Predicate<AccountModel> predicate = p -> p.getAccountNumber().equals(destination);
                 
-                Optional<Account> destinationAccount = database.stream().filter(predicate).
+                Optional<AccountModel> destinationAccount = database.stream().filter(predicate).
                         findFirst();
 
                 try {
-                    Account destinationAcc = destinationAccount.get();
+                    AccountModel destinationAcc = destinationAccount.get();
                     
-                    ValidationHelper amountValidation = amountScreen(account);
+                    ValidationModel amountValidation = amountScreen(account);
                     
                     if (amountValidation.isValid()) {
                         Double amount = Double.parseDouble(amountValidation.getMessage());
                         
-                        ValidationHelper confirmationValidation = confirmationScreen(account, 
+                        ValidationModel confirmationValidation = confirmationScreen(account, 
                                 destinationAcc, amount);
                         
                         boolean valid = confirmationValidation.isValid();
                     
                         goToScreen = confirmationValidation.getMessage();
 
-                        if (valid && goToScreen.equals(ScreenEnum.Screen.FUNDTRANSFER.name())) {
+                        if (valid && goToScreen.equals(ScreenEnum.FUNDTRANSFER.name())) {
                             repeat = true;
                         } else if (valid) {
                             repeat = false;
@@ -85,8 +106,8 @@ public class FundTransfer {
         * @param account
         * @return 
     */
-    private static ValidationHelper amountScreen(Account account) {
-        ValidationHelper validation = new ValidationHelper();
+    private ValidationModel amountScreen(AccountModel account) {
+        ValidationModel validationModel = new ValidationModel();
         
         System.out.println("---------------------------------------------------------");
         System.out.println("Please enter transfer amount and press enter to continue");
@@ -114,15 +135,15 @@ public class FundTransfer {
                 System.out.println("---------------------------------------------------------");
                 System.out.println("Insufficient balance $" + amount);
             } else {
-                validation.setValid(true);
-                validation.setMessage(strAmount);
+                validationModel.setValid(true);
+                validationModel.setMessage(strAmount);
             }
         } else {
             System.out.println("---------------------------------------------------------");
             System.out.println("Invalid Amount: should only contains numbers");
         }
         
-        return validation;
+        return validationModel;
     }
     
     /**
@@ -132,10 +153,12 @@ public class FundTransfer {
         * @param amount
         * @return ValidationHelper
     */
-    private static ValidationHelper confirmationScreen(Account account, Account destinationAcc, 
+    private ValidationModel confirmationScreen(AccountModel account, AccountModel destinationAcc, 
             Double amount) {
         
-        ValidationHelper validation = new ValidationHelper();
+        AccountService accountService = AccountService.getInstance();
+        
+        ValidationModel validationModel = new ValidationModel();
         
         String destinationNumber = destinationAcc.getAccountNumber();
         
@@ -164,21 +187,21 @@ public class FundTransfer {
         String scannerConfirmTransaction = new Scanner(System. in).nextLine().trim();
 
         if (scannerConfirmTransaction.equals("1")) {
-            boolean transferSucceed = AccountService.fundTransfer(account, destinationAcc, 
+            boolean transferSucceed = accountService.fundTransfer(account, destinationAcc, 
                     amount);
 
             if (transferSucceed) {
                 String goToScreen = summary(account, destinationAcc, amount, refNumber);
-                validation.setValid(true);
-                validation.setMessage(goToScreen);
+                validationModel.setValid(true);
+                validationModel.setMessage(goToScreen);
             }
         } else if (scannerConfirmTransaction.equals("2") || scannerConfirmTransaction.isEmpty()) {
-            String goToScreen = ScreenEnum.Screen.FUNDTRANSFER.name();
-            validation.setValid(true);
-            validation.setMessage(goToScreen);
+            String goToScreen = ScreenEnum.FUNDTRANSFER.name();
+            validationModel.setValid(true);
+            validationModel.setMessage(goToScreen);
         }
         
-        return validation;
+        return validationModel;
     }
     
     /**
@@ -189,7 +212,7 @@ public class FundTransfer {
         * @param refNumber String
         * @return ScreenEnum String
     */
-    private static String summary(Account account, Account destination, Double amount, 
+    private String summary(AccountModel account, AccountModel destination, Double amount, 
             String refNumber) {
         
         String destinationNumber = destination.getAccountNumber();
@@ -213,9 +236,9 @@ public class FundTransfer {
         String scannerConfirmTransaction = new Scanner(System. in).nextLine().trim();
         
         if (scannerConfirmTransaction.equals("1")) {
-            return ScreenEnum.Screen.TRANSACTION.name();
+            return ScreenEnum.TRANSACTION.name();
         } else {
-            return ScreenEnum.Screen.LOGIN.name();
+            return ScreenEnum.LOGIN.name();
         }
     }
     
@@ -223,7 +246,7 @@ public class FundTransfer {
         * Get 6 Digits Random String
         * @return Random String
     */
-    private static String getRandomString() {
+    private String getRandomString() {
         SecureRandom random = new SecureRandom();
         
         String DATA_FOR_RANDOM_STRING = "0123456789";

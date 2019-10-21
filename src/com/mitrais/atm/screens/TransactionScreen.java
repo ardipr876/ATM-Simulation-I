@@ -1,20 +1,42 @@
-package com.mitrais.atm;
+package com.mitrais.atm.screens;
 
+import com.mitrais.atm.models.AccountModel;
+import com.mitrais.atm.screens.enums.ScreenEnum;
 import java.util.List;
 import java.util.Scanner;
 
 /**
- * For transaction process
+ * Transaction Screen
  * @author Ardi_PR876
  */
-public class Transaction {
+public class TransactionScreen {
+    private static TransactionScreen INSTANCE;
+    
+    private TransactionScreen(){
+        
+    }
+    
+    /**
+     * Singleton Transaction Screen
+     * @return TransactionScreen INSTANCE
+     */
+    public static TransactionScreen getInstance(){
+        if (INSTANCE == null) {
+            INSTANCE = new TransactionScreen();
+        }
+        return INSTANCE;
+    }
     
     /**
         * Transaction Screen
-        * @param account Account
-        * @param database List of Account
+        * @param account AccountModel
+        * @param database List of AccountModel
     */
-    public static void transactionScreen(Account account, List<Account> database) {
+    public void transaction(AccountModel account, List<AccountModel> database) {
+        WithdrawScreen withdrawScreen = WithdrawScreen.getInstance();
+        
+        FundTransferScreen fundTransferScreen = FundTransferScreen.getInstance();
+                
         boolean repeat = true;
         
         do {
@@ -32,11 +54,11 @@ public class Transaction {
             String goToScreen;
             
             if ("1".equals(option)) {
-                goToScreen = Withdraw.withdrawScreen(account);
-                if(ScreenEnum.Screen.LOGIN.name().equals(goToScreen)) repeat = false;
+                goToScreen = withdrawScreen.withdraw(account);
+                if(ScreenEnum.LOGIN.name().equals(goToScreen)) repeat = false;
             } else if("2".equals(option)) {
-                goToScreen = FundTransfer.fundTransferScreen(account, database);
-                if(ScreenEnum.Screen.LOGIN.name().equals(goToScreen)) repeat = false;
+                goToScreen = fundTransferScreen.fundTransfer(account, database);
+                if(ScreenEnum.LOGIN.name().equals(goToScreen)) repeat = false;
             } else if("4".equals(option)) {
                 Double balance = account.getBalance();
                 System.out.println("---------------------------------------------------------");

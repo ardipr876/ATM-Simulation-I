@@ -1,23 +1,42 @@
-package com.mitrais.atm;
+package com.mitrais.atm.services;
 
+import com.mitrais.atm.models.AccountModel;
+import com.mitrais.atm.services.implement.IAccountService;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * get account, deduct balance, transfer fund
+ * Account Service
  * @author Ardi_PR876
  */
-public class AccountService {
+public class AccountService implements IAccountService {
+    private static AccountService INSTANCE;
+    
+    private AccountService(){
+        
+    }
+    
+    /**
+     * Singleton Account Service
+     * @return AccountService INSTANCE
+     */
+    public static AccountService getInstance(){
+        if (INSTANCE == null) {
+            INSTANCE = new AccountService();
+        }
+        return INSTANCE;
+    }
     
     /**
      * get account list
      * @return List Account 
      */
-    public static List<Account> getAccountList() {
-        List<Account> list = new ArrayList<>();
+    @Override
+    public List<AccountModel> getAccountList() {
+        List<AccountModel> list = new ArrayList<>();
         
-        list.add(new Account("John Doe", "112233", "012108", 100));
-        list.add(new Account("Jane Doe", "112244", "932012", 30));
+        list.add(new AccountModel("John Doe", "112233", "012108", 100));
+        list.add(new AccountModel("Jane Doe", "112244", "932012", 30));
         
         return list;
     }
@@ -28,7 +47,8 @@ public class AccountService {
      * @param amount
      * @return boolean
     */
-    public static boolean deductBalance(Account account, double amount) {
+    @Override
+    public boolean deductBalance(AccountModel account, double amount) {
         Double balance = account.getBalance();
         
         if (balance < amount) {
@@ -51,7 +71,8 @@ public class AccountService {
      * @param amount
      * @return boolean
     */
-    public static boolean fundTransfer(Account account, Account destination, Double amount) {
+    @Override
+    public boolean fundTransfer(AccountModel account, AccountModel destination, Double amount) {
         Double balance = account.getBalance();
         
         Double destinationBalance = destination.getBalance();
